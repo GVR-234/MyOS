@@ -15,6 +15,8 @@
 #include<fstream>
 #include<windows.h>
 #include<chrono>
+#define MAX_FILENAME_LENGTH 100
+#define MAX_FILE_CONTENT_LENGTH 1000
 using namespace std;
 void gotoxy(int x, int y)
 {
@@ -93,7 +95,7 @@ void EXIT() {
 	system("cls");
 	cout << "\t\tSaving User Files.....\n";
 	Sleep(1000);
-	cout << "\t\tClearing Up Files MyOS VERSION 1.0:)\n";
+	cout << "\t\tClearing Up Files MyOS VERSION 2.0:)\n";
 	Sleep(1000);
 	exit(0);
 }
@@ -123,11 +125,20 @@ void border() {
 void lock()
 {
 	char input[100], input2[100], y, c;
-	int g = 0;
+	int g = 0, i = 0;
 point:
 	border();
 	cout << "\n\n\n\n\n\n\t\tEnter the password:";
-	cin >> input;
+	while (true) {
+		ch = _getch();  // Get character without echoing to the console
+		if (ch == 13) { // Check if Enter key is pressed
+			input[i] = '\0'; // Null-terminate the string
+			break;
+		}
+		cout << '*'; // Print '*' to the console
+		input[i] = ch;
+		i++;
+	}
 	char charArray[100];
 	ifstream f;
 	f.open("password.txt");
@@ -345,35 +356,108 @@ void s2() {
 	start();
 }
 
+void createFile() {
+	char filename[MAX_FILENAME_LENGTH];
+	printf("Enter file name: ");
+	scanf("%s", filename);
+	FILE* file = fopen(filename, "w");
+	if (file == NULL) {
+		printf("Error creating file.\n");
+		return;
+	}
+	printf("File created successfully.\n");
+	fclose(file);
+}
 
+void openFile() {
+	char filename[MAX_FILENAME_LENGTH];
+	printf("Enter file name: ");
+	scanf("%s", filename);
+	FILE* file = fopen(filename, "r");
+	if (file == NULL) {
+		printf("Error opening file.\n");
+		return;
+	}
+	char content[MAX_FILE_CONTENT_LENGTH];
+	printf("\n--- File Content ---\n");
+	while (fgets(content, MAX_FILE_CONTENT_LENGTH, file) != NULL) {
+		printf("%s", content);
+	}
+	printf("\n");
+	fclose(file);
+}
 
+void editFile() {
+	char filename[MAX_FILENAME_LENGTH];
+	printf("Enter file name: ");
+	scanf("%s", filename);
+	FILE* file = fopen(filename, "a");
+	if (file == NULL) {
+		printf("Error opening file.\n");
+		return;
+	}
+	printf("Enter text to append (press Enter to finish):\n");
+	char text[MAX_FILE_CONTENT_LENGTH];
+	getchar(); // Clear input buffer
+	fgets(text, MAX_FILE_CONTENT_LENGTH, stdin);
+	fprintf(file, "%s", text);
+	fclose(file);
+}
+
+void deleteFile()
+{
+	char filename[MAX_FILENAME_LENGTH];
+	printf("Enter file name: ");
+	scanf("%s", filename);
+	remove(filename);
+	printf("File Deleted Successfully\n");
+}
+
+void renameFile()
+{
+	char filename1[MAX_FILENAME_LENGTH], filename2[MAX_FILENAME_LENGTH];
+	printf("Enter old file name: ");
+	scanf("%s", filename1);
+	printf("Enter new file name: ");
+	scanf("%s", filename2);
+	printf("File has been renamed from %s to %s successfully\n", filename1, filename2);
+}
 void s3() { //word document
 	system("cls");
-
-	int op;
-	cout << "1.Load old file\n";
-	cout << "2.Create New file\n";
-	cin >> op;
-	if (op == 2) {
-		ofstream stream;
-		char charArray[100];
-		cout << "Start Typing Pls use '_' instead of spaces \n";
-		cin >> charArray;
-		stream.open("C:\\myurl.txt");
-		stream << charArray << "\n";
-		cout << "Saved..!!";
-	}
-	else if (op == 1) {
-		char charArray[100];
-		ifstream f;
-		f.open("C:\\myurl.txt");
-		while ((!f.eof()))
-		{
-			f >> charArray;
-			cout << charArray;
+	int choice{ 0 };
+	do {
+		printf("Text Editor Menu\n");
+		printf("1. Create File\n");
+		printf("2. Open File\n");
+		printf("3. Edit File\n");
+		printf("4. Delete File\n");
+		printf("5. Rename File\n");
+		printf("6. Exit\n");
+		printf("Enter your choice: ");
+		scanf("%d", &choice);
+		switch (choice) {
+		case 1:
+			createFile();
+			break;
+		case 2:
+			openFile();
+			break;
+		case 3:
+			editFile();
+			break;
+		case 4:
+			deleteFile();
+			break;
+		case 5:
+			renameFile();
+			break;
+		case 6:
+			printf("Exiting.\n");
+			break;
+		default:
+			printf("Invalid choice. Please enter a number between 1 and 4.\n");
 		}
-		f.close();
-	}
+	} while (choice != 4);
 	int quit = 1;
 	if (quit == 1)
 	{
